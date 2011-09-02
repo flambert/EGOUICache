@@ -27,17 +27,18 @@
 #import <Foundation/Foundation.h>
 
 UIImage* EGOUICachedDrawing(id target, SEL selector, CGRect rect, NSString* salt);
+UIImage* EGOUICachedDrawingWithTimeoutInterval(id target, SEL selector, CGRect rect, NSString* salt, NSTimeInterval timeoutInterval);
 
 // Should be called from the method calling EGOUICachedDrawing, cancels 1 level 
-void EGOUICacheCancel();
+void EGOUICacheCancel(void);
 
 // Sets the maximum length the cache will persist for.
 // Important: This does not guarantee cache will persist for this period, since caches can be cleared at any time.
 void EGOUICacheSetCacheTimeoutInterval(NSTimeInterval cacheTimeoutInterval);
 
 // Convenience methods for EGOUICacheSetCacheTimeoutInterval
-void EGOUICacheSetCacheTimeoutOneYear();
-void EGOUICacheSetCacheTimeoutOneMonth();
-void EGOUICacheSetCacheTimeoutOneWeek();
-void EGOUICacheSetCacheTimeoutOneDay();
-void EGOUICacheSetCacheTimeoutOneHour();
+void EGOUICacheSetCacheTimeoutOneYear(void);
+void EGOUICacheSetCacheTimeoutOneMonth(void);
+void EGOUICacheSetCacheTimeoutOneWeek(void);
+void EGOUICacheSetCacheTimeoutOneDay(void);
+void EGOUICacheSetCacheTimeoutOneHour(void);

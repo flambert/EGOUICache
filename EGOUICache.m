@@ -32,16 +32,20 @@ static BOOL _cancelCache;
 static NSTimeInterval _cacheTimeoutInterval = 604800;
 
 UIImage* EGOUICachedDrawing(id target, SEL selector, CGRect rect, NSString* salt) {
-	NSString* key = @"EGOUI-";
-	key = [key stringByAppendingFormat:@"%@-", NSStringFromClass([target class])];
-	key = [key stringByAppendingFormat:@"%@-", NSStringFromSelector(selector)];
-	key = [key stringByAppendingFormat:@"%.2fx%.2f-", rect.size.width, rect.size.height];
-	key = [key stringByAppendingString:salt];
-	key = [key stringByAppendingString:@".png"];
+    return EGOUICachedDrawingWithTimeoutInterval(target, selector, rect, salt, _cacheTimeoutInterval);
+}
 
+UIImage* EGOUICachedDrawingWithTimeoutInterval(id target, SEL selector, CGRect rect, NSString* salt, NSTimeInterval cacheTimeoutInterval) {
+	NSMutableString* key = [[NSMutableString alloc] initWithFormat:@"EGOUICache/%@/%@/%.2fx%.2f/%@.png",
+                            NSStringFromClass([target class]),
+                            NSStringFromSelector(selector),
+                            rect.size.width, rect.size.height,
+                            salt];
+    
 	UIImage* image = nil;
 	
 	if((image = [[EGOCache currentCache] imageForKey:key])) {
+        [key release];
 		return image;
 	} else {
 		CGRect adjustedRect = rect;
@@ -73,16 +77,19 @@ UIImage* EGOUICachedDrawing(id target, SEL selector, CGRect rect, NSString* salt
 			image = [UIImage imageWithCGImage:cgImage];
 			CGImageRelease(cgImage);
 			
-			[[EGOCache currentCache] setImage:image forKey:key withTimeoutInterval:_cacheTimeoutInterval];
+			[[EGOCache currentCache] setImage:image forKey:key withTimeoutInterval:cacheTimeoutInterval];
+            [key release];
 			return image;
 		} else {
 			_cancelCache = NO;
+			CGContextRelease(imageContext);
+            [key release];
 			return nil;
 		}
 	}
 }
 
-void EGOUICacheCancel() {
+void EGOUICacheCancel(void) {
 	_cancelCache = YES;
 }
 
@@ -90,22 +97,22 @@ void EGOUICacheSetCacheTimeoutInterval(NSTimeInterval cacheTimeoutInterval) {
 	_cacheTimeoutInterval = cacheTimeoutInterval;
 }
 
-void EGOUICacheSetCacheTimeoutOneYear() {
+void EGOUICacheSetCacheTimeoutOneYear(void) {
 	EGOUICacheSetCacheTimeoutInterval(31556926);
 }
 
-void EGOUICacheSetCacheTimeoutOneMonth() {
+void EGOUICacheSetCacheTimeoutOneMonth(void) {
 	EGOUICacheSetCacheTimeoutInterval(2629743.83);
 }
 
-void EGOUICacheSetCacheTimeoutOneWeek() {
+void EGOUICacheSetCacheTimeoutOneWeek(void) {
 	EGOUICacheSetCacheTimeoutInterval(604800);
 }
 
-void EGOUICacheSetCacheTimeoutOneDay() {
+void EGOUICacheSetCacheTimeoutOneDay(void) {
 	EGOUICacheSetCacheTimeoutInterval(86400);
 }
 
-void EGOUICacheSetCacheTimeoutOneHour() {
+void EGOUICacheSetCacheTimeoutOneHour(void) {
 	EGOUICacheSetCacheTimeoutInterval(3600);
 }
